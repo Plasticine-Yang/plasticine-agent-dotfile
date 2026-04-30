@@ -1,0 +1,30 @@
+{
+  "name": "plasticine-agent-dotfile",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "plasticine-agent-dotfile": "./dist/cli.js",
+    "pad": "./dist/cli.js"
+  },
+  "packageManager": "pnpm@10.8.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "rolldown -c",
+    "dev": "rolldown -c -w",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@clack/prompts": "latest",
+    "commander": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "rolldown": "latest",
+    "typescript": "latest",
+    "vitest": "latest"
+  }
+}
