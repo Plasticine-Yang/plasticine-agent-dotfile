@@ -4,6 +4,15 @@
 
 ## Quick start
 
+If you are using Claude Code, prefer the repository skill first:
+
+- skill name: `plasticine-agent-dotfile`
+- skill file: `skills/plasticine-agent-dotfile/SKILL.md`
+
+Use that skill when you want Claude to initialize, inspect, edit, or install from a `plasticine-agent-dotfile` config on your behalf.
+
+If you want to run the CLI directly yourself:
+
 Create a config file in the current directory:
 
 ```bash
