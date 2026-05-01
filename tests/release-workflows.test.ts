@@ -11,6 +11,12 @@ async function readFileFromRepository(relativePath: string) {
 }
 
 describe('release workflows', () => {
+  it('ignores the generated changeset README when checking for unconsumed changesets', async () => {
+    const workflow = await readFileFromRepository('.github/workflows/release.yml');
+
+    expect(workflow).toContain("find .changeset -maxdepth 1 -name '*.md' ! -name 'README.md' -print -quit | grep -q .");
+  });
+
   it('publishes latest only after merged pull requests to main or manual dispatch', async () => {
     const workflow = await readFileFromRepository('.github/workflows/release.yml');
 

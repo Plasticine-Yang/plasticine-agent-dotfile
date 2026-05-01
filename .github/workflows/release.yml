@@ -35,7 +35,7 @@ jobs:
 
       - name: Ensure all changesets are consumed
         run: |
-          find .changeset -maxdepth 1 -name '*.md' -print -quit | grep -q . && {
+          find .changeset -maxdepth 1 -name '*.md' ! -name 'README.md' -print -quit | grep -q . && {
             echo 'Found unconsumed changesets.'
             exit 1
           } || true
