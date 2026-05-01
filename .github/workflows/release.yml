@@ -55,7 +55,7 @@ jobs:
           username: ${{ secrets.SMTP_USERNAME }}
           password: ${{ secrets.SMTP_PASSWORD }}
           subject: ${{ steps.release.outputs.package_name }} release published
-          to: ${{ github.event_name == 'workflow_dispatch' && github.actor || github.event.pull_request.user.email }}
+          to: ${{ secrets.SMTP_FROM }}
           from: ${{ secrets.SMTP_FROM }}
           body: |
             Package: ${{ steps.release.outputs.package_name }}

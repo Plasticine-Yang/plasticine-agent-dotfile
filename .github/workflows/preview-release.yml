@@ -47,7 +47,7 @@ jobs:
           username: ${{ secrets.SMTP_USERNAME }}
           password: ${{ secrets.SMTP_PASSWORD }}
           subject: ${{ steps.release.outputs.package_name }} preview release published
-          to: ${{ github.actor }}
+          to: ${{ secrets.SMTP_FROM }}
           from: ${{ secrets.SMTP_FROM }}
           body: |
             Package: ${{ steps.release.outputs.package_name }}
