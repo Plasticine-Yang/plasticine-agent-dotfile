@@ -1,0 +1,59 @@
+name: preview-release
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Branch or commit to publish
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.8.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org/
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Publish preview release
+        id: release
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          PREVIEW_REF: ${{ inputs.ref }}
+        run: pnpm release:publish:preview
+
+      - name: Send preview release email
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_HOST }}
+          server_port: ${{ secrets.SMTP_PORT }}
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: ${{ steps.release.outputs.package_name }} preview release published
+          to: ${{ github.actor }}
+          from: ${{ secrets.SMTP_FROM }}
+          body: |
+            Package: ${{ steps.release.outputs.package_name }}
+            Dist-tag: ${{ steps.release.outputs.dist_tag }}
+            Version: ${{ steps.release.outputs.version }}
+            Commit: ${{ steps.release.outputs.commit }}
+
+            Ref: ${{ inputs.ref }}
+            Triggered by: ${{ github.actor }}

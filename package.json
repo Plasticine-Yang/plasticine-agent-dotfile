@@ -1,12 +1,16 @@
 {
   "name": "plasticine-agent-dotfile",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.2.0",
   "type": "module",
   "bin": {
-    "plasticine-agent-dotfile": "./dist/cli.js",
-    "pad": "./dist/cli.js"
+    "plasticine-agent-dotfile": "dist/cli.js",
+    "pad": "dist/cli.js"
   },
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md"
+  ],
   "packageManager": "pnpm@10.8.0",
   "engines": {
     "node": ">=22"
@@ -15,13 +19,22 @@
     "build": "rolldown -c",
     "dev": "rolldown -c -w",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "prepack": "pnpm build",
+    "prepublishOnly": "pnpm release:check",
+    "changeset": "changeset",
+    "changeset:version": "changeset version",
+    "release:check": "pnpm test && pnpm typecheck",
+    "release:publish": "node ./scripts/publish-release.mjs",
+    "release:publish:preview": "node ./scripts/publish-preview-release.mjs",
+    "release:preview": "gh workflow run preview-release.yml --ref \"$(git branch --show-current)\" -f ref=\"$(git branch --show-current)\""
   },
   "dependencies": {
     "@clack/prompts": "latest",
     "commander": "latest"
   },
   "devDependencies": {
+    "@changesets/cli": "latest",
     "@types/node": "latest",
     "rolldown": "latest",
     "typescript": "latest",
