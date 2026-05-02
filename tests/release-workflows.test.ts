@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { access, readFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
@@ -8,6 +8,15 @@ const repositoryRoot = resolve(testDirectory, "..");
 
 async function readFileFromRepository(relativePath: string) {
   return readFile(resolve(repositoryRoot, relativePath), "utf8");
+}
+
+async function fileExistsInRepository(relativePath: string) {
+  try {
+    await access(resolve(repositoryRoot, relativePath));
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 describe("release workflows", () => {
@@ -46,16 +55,29 @@ describe("release workflows", () => {
     expect(workflow).toContain("html_body: $" + "{{ steps.release.outputs.email_html }}");
   });
 
-  it("uses publish scripts that derive release metadata from the package file", async () => {
+  it("runs release scripts directly from TypeScript entrypoints and preserves GitHub output fields", async () => {
     const packageJson = await readFileFromRepository("package.json");
-    const publishReleaseScript = await readFileFromRepository("scripts/publish-release.mjs");
-    const publishPreviewScript = await readFileFromRepository("scripts/publish-preview-release.mjs");
+    const publishReleaseScriptExists = await fileExistsInRepository("scripts/publish-release.ts");
+    const publishPreviewScriptExists = await fileExistsInRepository("scripts/publish-preview-release.ts");
 
-    expect(packageJson).toContain('"release:publish": "node ./scripts/publish-release.mjs"');
-    expect(packageJson).toContain('"release:publish:preview": "node ./scripts/publish-preview-release.mjs"');
-    expect(publishReleaseScript).toContain('email_subject=${emailSubject}');
-    expect(publishReleaseScript).toContain('email_html<<${outputDelimiter}');
-    expect(publishPreviewScript).toContain('email_subject=${emailSubject}');
-    expect(publishPreviewScript).toContain('email_html<<${outputDelimiter}');
+    expect(packageJson).toContain('"release:publish": "tsx ./scripts/publish-release.ts"');
+    expect(packageJson).toContain('"release:publish:preview": "tsx ./scripts/publish-preview-release.ts"');
+    expect(packageJson).toContain('"tsx": "latest"');
+    await expect(fileExistsInRepository("scripts/publish-release.ts")).resolves.toBe(true);
+    await expect(fileExistsInRepository("scripts/publish-preview-release.ts")).resolves.toBe(true);
+
+    if (publishReleaseScriptExists) {
+      const publishReleaseScript = await readFileFromRepository("scripts/publish-release.ts");
+      expect(publishReleaseScript).toContain('from "./release-email"');
+      expect(publishReleaseScript).toContain("email_subject=${emailSubject}");
+      expect(publishReleaseScript).toContain("email_html<<${outputDelimiter}");
+    }
+
+    if (publishPreviewScriptExists) {
+      const publishPreviewScript = await readFileFromRepository("scripts/publish-preview-release.ts");
+      expect(publishPreviewScript).toContain('from "./release-email"');
+      expect(publishPreviewScript).toContain("email_subject=${emailSubject}");
+      expect(publishPreviewScript).toContain("email_html<<${outputDelimiter}");
+    }
   });
 });

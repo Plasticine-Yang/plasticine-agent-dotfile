@@ -28,8 +28,8 @@ describe("package metadata", () => {
       "release:check": "pnpm check",
       changeset: "changeset",
       "changeset:version": "changeset version",
-      "release:publish": "node ./scripts/publish-release.mjs",
-      "release:publish:preview": "node ./scripts/publish-preview-release.mjs",
+      "release:publish": "tsx ./scripts/publish-release.ts",
+      "release:publish:preview": "tsx ./scripts/publish-preview-release.ts",
     });
   });
 

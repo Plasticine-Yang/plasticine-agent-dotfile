@@ -30,8 +30,8 @@
     "changeset": "changeset",
     "changeset:version": "changeset version",
     "release:check": "pnpm check",
-    "release:publish": "node ./scripts/publish-release.mjs",
-    "release:publish:preview": "node ./scripts/publish-preview-release.mjs",
+    "release:publish": "tsx ./scripts/publish-release.ts",
+    "release:publish:preview": "tsx ./scripts/publish-preview-release.ts",
     "release:preview": "gh workflow run preview-release.yml --ref \"$(git branch --show-current)\" -f ref=\"$(git branch --show-current)\""
   },
   "dependencies": {
@@ -43,6 +43,7 @@
     "@changesets/cli": "latest",
     "@types/node": "latest",
     "rolldown": "latest",
+    "tsx": "latest",
     "typescript": "latest",
     "vitest": "latest"
   }

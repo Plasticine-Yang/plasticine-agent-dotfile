@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { execFileSync } from "node:child_process";
 import { appendFileSync, readFileSync, writeFileSync } from "node:fs";
-import { createReleaseEmail } from "./release-email.js";
+import { createReleaseEmail } from "./release-email";
 
 const ref = process.env.PREVIEW_REF;
 if (!ref) {
