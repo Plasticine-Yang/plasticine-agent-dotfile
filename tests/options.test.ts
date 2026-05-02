@@ -1,8 +1,8 @@
-import { describe, expect, it } from 'vitest';
-import { ALL_AGENTS, resolveInstallRequest } from '../src/options.js';
+import { describe, expect, it } from "vitest";
+import { ALL_AGENTS, resolveInstallRequest } from "../src/options.js";
 
-describe('resolveInstallRequest', () => {
-  it('defaults skill agents to all when skills are requested by flag', () => {
+describe("resolveInstallRequest", () => {
+  it("defaults skill agents to all when skills are requested by flag", () => {
     const result = resolveInstallRequest({
       skills: true,
       claudeCodePlugins: false,
@@ -18,7 +18,7 @@ describe('resolveInstallRequest', () => {
     });
   });
 
-  it('uses prompts when no install scope flags are provided', () => {
+  it("uses prompts when no install scope flags are provided", () => {
     const result = resolveInstallRequest({
       skills: false,
       claudeCodePlugins: false,
@@ -34,13 +34,13 @@ describe('resolveInstallRequest', () => {
     });
   });
 
-  it('rejects agent flags without skills', () => {
+  it("rejects agent flags without skills", () => {
     expect(() =>
       resolveInstallRequest({
         skills: false,
         claudeCodePlugins: true,
-        agents: ['claude-code'],
+        agents: ["claude-code"],
       }),
-    ).toThrow('--agent can only be used together with --skills');
+    ).toThrow("--agent can only be used together with --skills");
   });
 });

@@ -1,6 +1,6 @@
-import { access, readFile, writeFile } from 'node:fs/promises';
-import { constants as fsConstants } from 'node:fs';
-import { resolve } from 'node:path';
+import { constants as fsConstants } from "node:fs";
+import { access, readFile, writeFile } from "node:fs/promises";
+import { resolve } from "node:path";
 
 export type SkillCommandConfig = {
   sourceName: string;
@@ -16,21 +16,21 @@ export type RemoteConfig = {
   claudeCodePlugins: ClaudeCodePluginConfig[];
 };
 
-export const DEFAULT_CONFIG_FILE_NAME = 'plasticine-agent-dotfile.config.json';
-const ENV_CONFIG_JSON_URL_KEY = 'PLASTICINE_AGENT_DOTFILE_CONFIG_JSON_URL';
+export const DEFAULT_CONFIG_FILE_NAME = "plasticine-agent-dotfile.config.json";
+const ENV_CONFIG_JSON_URL_KEY = "PLASTICINE_AGENT_DOTFILE_CONFIG_JSON_URL";
 
 export type ConfigUrlResolution = {
   url: string;
-  source: 'env' | 'flag';
+  source: "env" | "flag";
 };
 
 export type InstallConfigSource =
   | {
-      kind: 'file';
+      kind: "file";
       path: string;
     }
   | {
-      kind: 'remote';
+      kind: "remote";
       resolution: ConfigUrlResolution;
     };
 
@@ -41,7 +41,7 @@ export async function resolveInstallConfigSource(
 ): Promise<InstallConfigSource> {
   if (configFilePath) {
     return {
-      kind: 'file',
+      kind: "file",
       path: await resolveConfigFilePath(configFilePath),
     };
   }
@@ -49,7 +49,7 @@ export async function resolveInstallConfigSource(
   const defaultFilePath = resolve(cwd, DEFAULT_CONFIG_FILE_NAME);
   if (await fileExists(defaultFilePath)) {
     return {
-      kind: 'file',
+      kind: "file",
       path: defaultFilePath,
     };
   }
@@ -57,12 +57,14 @@ export async function resolveInstallConfigSource(
   const remoteResolution = await resolveRemoteConfigUrl(configJsonUrl);
   if (remoteResolution) {
     return {
-      kind: 'remote',
+      kind: "remote",
       resolution: remoteResolution,
     };
   }
 
-  throw new Error(`No config found. Run \`plasticine-agent-dotfile init\` to create ${DEFAULT_CONFIG_FILE_NAME} and try again.`);
+  throw new Error(
+    `No config found. Run \`plasticine-agent-dotfile init\` to create ${DEFAULT_CONFIG_FILE_NAME} and try again.`,
+  );
 }
 
 export async function resolveConfigFilePath(filePath: string): Promise<string> {
@@ -74,7 +76,7 @@ export async function resolveConfigFilePath(filePath: string): Promise<string> {
 }
 
 export async function readConfigFile(filePath: string): Promise<RemoteConfig> {
-  const raw = await readFile(filePath, 'utf8');
+  const raw = await readFile(filePath, "utf8");
 
   let payload: unknown;
   try {
@@ -87,7 +89,7 @@ export async function readConfigFile(filePath: string): Promise<RemoteConfig> {
 }
 
 export async function writeConfigFile(filePath: string, config: RemoteConfig): Promise<void> {
-  await writeFile(filePath, `${JSON.stringify(config, null, 2)}\n`, 'utf8');
+  await writeFile(filePath, `${JSON.stringify(config, null, 2)}\n`, "utf8");
 }
 
 export function createInitialConfig(): RemoteConfig {
@@ -146,14 +148,14 @@ export async function resolveRemoteConfigUrl(flagValue?: string): Promise<Config
   if (envValue) {
     return {
       url: validateConfigJsonUrl(envValue),
-      source: 'env',
+      source: "env",
     };
   }
 
   if (flagValue) {
     return {
       url: validateConfigJsonUrl(flagValue),
-      source: 'flag',
+      source: "flag",
     };
   }
 
@@ -186,18 +188,18 @@ export async function loadRemoteConfig(url: string, fetchImpl: typeof fetch = fe
 
 export function validateRemoteConfig(value: unknown): RemoteConfig {
   if (!isRecord(value)) {
-    throw new Error('Invalid config shape: expected a JSON object');
+    throw new Error("Invalid config shape: expected a JSON object");
   }
 
   const skills = value.skills;
   const claudeCodePlugins = value.claudeCodePlugins;
 
   if (!Array.isArray(skills)) {
-    throw new Error('Invalid config shape: skills must be an array');
+    throw new Error("Invalid config shape: skills must be an array");
   }
 
   if (!Array.isArray(claudeCodePlugins)) {
-    throw new Error('Invalid config shape: claudeCodePlugins must be an array');
+    throw new Error("Invalid config shape: claudeCodePlugins must be an array");
   }
 
   return {
@@ -206,13 +208,17 @@ export function validateRemoteConfig(value: unknown): RemoteConfig {
   };
 }
 
-export function assertInstallSelectionSupported(config: RemoteConfig, installSkills: boolean, installClaudeCodePlugins: boolean): void {
+export function assertInstallSelectionSupported(
+  config: RemoteConfig,
+  installSkills: boolean,
+  installClaudeCodePlugins: boolean,
+): void {
   if (installSkills && config.skills.length === 0) {
-    throw new Error('Config does not define any skills to install');
+    throw new Error("Config does not define any skills to install");
   }
 
   if (installClaudeCodePlugins && config.claudeCodePlugins.length === 0) {
-    throw new Error('Config does not define any Claude Code plugins to install');
+    throw new Error("Config does not define any Claude Code plugins to install");
   }
 }
 
@@ -221,11 +227,11 @@ function validateSkillCommandConfig(value: unknown, index: number): SkillCommand
     throw new Error(`Invalid config shape: skills[${index}] must be an object`);
   }
 
-  if (typeof value.sourceName !== 'string' || value.sourceName.length === 0) {
+  if (typeof value.sourceName !== "string" || value.sourceName.length === 0) {
     throw new Error(`Invalid config shape: skills[${index}].sourceName must be a non-empty string`);
   }
 
-  if (typeof value.skillName !== 'string' || value.skillName.length === 0) {
+  if (typeof value.skillName !== "string" || value.skillName.length === 0) {
     throw new Error(`Invalid config shape: skills[${index}].skillName must be a non-empty string`);
   }
 
@@ -240,7 +246,7 @@ function validateClaudeCodePluginConfig(value: unknown, index: number): ClaudeCo
     throw new Error(`Invalid config shape: claudeCodePlugins[${index}] must be an object`);
   }
 
-  if (typeof value.packageName !== 'string' || value.packageName.length === 0) {
+  if (typeof value.packageName !== "string" || value.packageName.length === 0) {
     throw new Error(`Invalid config shape: claudeCodePlugins[${index}].packageName must be a non-empty string`);
   }
 
@@ -254,11 +260,11 @@ function validateConfigJsonUrl(value: string): string {
   try {
     url = new URL(value);
   } catch {
-    throw new Error('Config JSON URL must be a valid URL');
+    throw new Error("Config JSON URL must be a valid URL");
   }
 
-  if (url.protocol !== 'http:' && url.protocol !== 'https:') {
-    throw new Error('Config JSON URL must use http or https');
+  if (url.protocol !== "http:" && url.protocol !== "https:") {
+    throw new Error("Config JSON URL must use http or https");
   }
 
   return url.toString();
@@ -274,7 +280,7 @@ async function fileExists(filePath: string): Promise<boolean> {
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null;
+  return typeof value === "object" && value !== null;
 }
 
 function formatError(error: unknown): string {

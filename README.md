@@ -30,6 +30,24 @@ npx plasticine-agent-dotfile install
 
 If you installed the package globally and exposed the bin alias, you can also use `pad`.
 
+## Development
+
+Quality commands:
+
+```bash
+pnpm format
+pnpm format:check
+pnpm lint
+pnpm lint:fix
+pnpm check
+```
+
+- `pnpm format` formats the repository with Biome.
+- `pnpm format:check` verifies formatting without writing files.
+- `pnpm lint` runs Biome lint checks.
+- `pnpm lint:fix` applies Biome's safe fixes.
+- `pnpm check` runs lint, format verification, type checking, and tests.
+
 ## Local config file
 
 The default file name is:

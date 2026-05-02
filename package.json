@@ -18,13 +18,18 @@
   "scripts": {
     "build": "rolldown -c",
     "dev": "rolldown -c -w",
+    "lint": "biome check .",
+    "lint:fix": "biome check . --write",
+    "format": "biome format . --write",
+    "format:check": "biome format .",
+    "check": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "prepack": "pnpm build",
     "prepublishOnly": "pnpm release:check",
     "changeset": "changeset",
     "changeset:version": "changeset version",
-    "release:check": "pnpm test && pnpm typecheck",
+    "release:check": "pnpm check",
     "release:publish": "node ./scripts/publish-release.mjs",
     "release:publish:preview": "node ./scripts/publish-preview-release.mjs",
     "release:preview": "gh workflow run preview-release.yml --ref \"$(git branch --show-current)\" -f ref=\"$(git branch --show-current)\""
@@ -34,6 +39,7 @@
     "commander": "latest"
   },
   "devDependencies": {
+    "@biomejs/biome": "latest",
     "@changesets/cli": "latest",
     "@types/node": "latest",
     "rolldown": "latest",

@@ -1,4 +1,4 @@
-export const ALL_AGENTS = ['claude-code', 'trae', 'trae-cn'] as const;
+export const ALL_AGENTS = ["claude-code", "trae", "trae-cn"] as const;
 
 export type AgentName = (typeof ALL_AGENTS)[number];
 
@@ -18,7 +18,7 @@ export type ResolvedInstallRequest = {
 
 export function resolveInstallRequest(flags: InstallFlags): ResolvedInstallRequest {
   if (!flags.skills && flags.agents?.length) {
-    throw new Error('--agent can only be used together with --skills');
+    throw new Error("--agent can only be used together with --skills");
   }
 
   const installSkills = Boolean(flags.skills);
