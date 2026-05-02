@@ -13,6 +13,22 @@ export type FailedCommand = {
   error: Error;
 };
 
+export type InstallCommand =
+  | {
+      target: "skill";
+      label: string;
+      command: "skills";
+      args: string[];
+      skillName: string;
+    }
+  | {
+      target: "plugin";
+      label: string;
+      command: "claude";
+      args: string[];
+      packageName: string;
+    };
+
 export async function installAll(
   plan: InstallPlan,
   config: RemoteConfig,
@@ -20,23 +36,11 @@ export async function installAll(
 ): Promise<void> {
   const commands = buildCommands(plan, config);
   const failures: FailedCommand[] = [];
+  const skillCommands = commands.filter((command) => command.target === "skill");
+  const pluginCommands = commands.filter((command) => command.target === "plugin");
 
-  commands.forEach(({ label }, index) => {
-    process.stdout.write(`[${index + 1}/${commands.length}] ${label}\n`);
-  });
-
-  for (const command of commands) {
-    try {
-      await runner(command.command, command.args);
-    } catch (error) {
-      const normalized = error instanceof Error ? error : new Error(String(error));
-      process.stderr.write(`Step failed: ${command.label}\n`);
-      failures.push({
-        command: [command.command, ...command.args].join(" "),
-        error: normalized,
-      });
-    }
-  }
+  await installSkills(skillCommands, runner, failures);
+  await installPlugins(pluginCommands, runner, failures);
 
   if (failures.length > 0) {
     process.stderr.write(`Installation finished with ${failures.length} failure(s).\n`);
@@ -50,12 +54,13 @@ export async function installAll(
   process.stdout.write("Installation complete.\n");
 }
 
-export function buildCommands(plan: InstallPlan, config: RemoteConfig) {
-  const commands: Array<{ label: string; command: string; args: string[] }> = [];
+export function buildCommands(plan: InstallPlan, config: RemoteConfig): InstallCommand[] {
+  const commands: InstallCommand[] = [];
 
   if (plan.installSkills) {
     for (const entry of config.skills) {
       commands.push({
+        target: "skill",
         label: `skills add ${entry.skillName}`,
         command: "skills",
         args: [
@@ -67,6 +72,7 @@ export function buildCommands(plan: InstallPlan, config: RemoteConfig) {
           "-y",
           ...plan.agents.flatMap((agent) => ["-a", agent]),
         ],
+        skillName: entry.skillName,
       });
     }
   }
@@ -74,12 +80,73 @@ export function buildCommands(plan: InstallPlan, config: RemoteConfig) {
   if (plan.installClaudeCodePlugins) {
     for (const entry of config.claudeCodePlugins) {
       commands.push({
+        target: "plugin",
         label: `claude plugin install ${entry.packageName}`,
         command: "claude",
         args: ["plugin", "install", entry.packageName],
+        packageName: entry.packageName,
       });
     }
   }
 
   return commands;
+}
+
+async function installSkills(
+  commands: Extract<InstallCommand, { target: "skill" }>[],
+  runner: CommandRunner,
+  failures: FailedCommand[],
+) {
+  if (commands.length === 0) {
+    return;
+  }
+
+  const total = commands.length;
+  let settled = 0;
+
+  writeSkillProgress(settled, total, "installing…");
+
+  await Promise.all(
+    commands.map(async (command) => {
+      try {
+        await runner(command.command, command.args, { output: "silent" });
+      } catch (error) {
+        const normalized = error instanceof Error ? error : new Error(String(error));
+        failures.push({
+          command: [command.command, ...command.args].join(" "),
+          error: normalized,
+        });
+      } finally {
+        settled += 1;
+        writeSkillProgress(settled, total, "installing…");
+      }
+    }),
+  );
+
+  writeSkillProgress(settled, total, failures.length > 0 ? "completed with failures" : "completed");
+  process.stdout.write("\n");
+}
+
+function writeSkillProgress(current: number, total: number, status: string) {
+  const currentText = String(current).padStart(2, "0");
+  const totalText = String(total).padStart(2, "0");
+  process.stdout.write(`\r\x1b[2K${currentText}/${totalText} ${status}`);
+}
+
+async function installPlugins(
+  commands: Extract<InstallCommand, { target: "plugin" }>[],
+  runner: CommandRunner,
+  failures: FailedCommand[],
+) {
+  for (const command of commands) {
+    try {
+      await runner(command.command, command.args, { output: "stream" });
+    } catch (error) {
+      const normalized = error instanceof Error ? error : new Error(String(error));
+      failures.push({
+        command: [command.command, ...command.args].join(" "),
+        error: normalized,
+      });
+    }
+  }
 }

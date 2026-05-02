@@ -46,14 +46,7 @@ jobs:
           server_port: ${{ secrets.SMTP_PORT }}
           username: ${{ secrets.SMTP_USERNAME }}
           password: ${{ secrets.SMTP_PASSWORD }}
-          subject: ${{ steps.release.outputs.package_name }} preview release published
+          subject: ${{ steps.release.outputs.email_subject }}
           to: ${{ secrets.SMTP_FROM }}
           from: ${{ secrets.SMTP_FROM }}
-          body: |
-            Package: ${{ steps.release.outputs.package_name }}
-            Dist-tag: ${{ steps.release.outputs.dist_tag }}
-            Version: ${{ steps.release.outputs.version }}
-            Commit: ${{ steps.release.outputs.commit }}
-
-            Ref: ${{ inputs.ref }}
-            Triggered by: ${{ github.actor }}
+          html_body: ${{ steps.release.outputs.email_html }}
