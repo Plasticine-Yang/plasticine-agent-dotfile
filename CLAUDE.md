@@ -6,11 +6,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - `pnpm build` — build the CLI with rolldown into `dist/cli.js`
 - `pnpm typecheck` — run TypeScript type checking with `tsc --noEmit`
-- `pnpm test` — run the Vitest suite
-- `pnpm check` — run the full verification gate (`lint`, `format:check`, `typecheck`, and `test`)
+- `pnpm test` — run the full Vitest suite
 - `pnpm test -- tests/install.test.ts` — run a single test file with Vitest
 - `pnpm test -- tests/install.test.ts -t "builds both skill and plugin commands from config"` — run a single named test
+- `pnpm format:check` — verify formatting with Biome
+- `pnpm check` — run the full verification gate (`lint`, `format:check`, `typecheck`, and `test`)
 - `pnpm exec plasticine-agent-dotfile <command>` — run the CLI locally through the package manager
+
+## Communication
+
+- Keep responses short and concrete.
+- When referencing code, include file paths.
+- Prefer the smallest targeted change over broad refactors.
+- Do not create new files unless they are necessary for the task.
+- When work is complete, report the exact verification command that was run.
 
 ## Runtime shape
 
@@ -88,8 +97,18 @@ The tests are organized by responsibility rather than by command:
 - `tests/install.test.ts` — command generation and install execution behavior
 - `tests/options.test.ts` — install flag resolution behavior
 - `tests/package.test.ts` — package metadata and published bin names
+- `tests/release-email.test.ts` — release email generation behavior
+- `tests/release-workflows.test.ts` — release and preview workflow expectations
 
 When behavior spans multiple modules, update the focused test file for each module rather than creating a single broad integration test by default.
+
+## Verification
+
+- After code changes, run the narrowest relevant verification command first.
+- Use `pnpm typecheck` for type-only or cross-cutting TypeScript changes.
+- Use `pnpm test -- <file>` when a focused test file covers the behavior you changed.
+- Use `pnpm check` for release-impacting changes, multi-module changes, or when no narrower command gives enough confidence.
+- If user-facing CLI behavior changes, update `README.md` in the same change.
 
 ## Docs expectations
 
@@ -101,7 +120,7 @@ When behavior spans multiple modules, update the focused test file for each modu
 
 ## Git workflow
 
-- Any change must be made on a branch created from `main`.
+- If the current branch is `main`, create a new branch from `main` before making any changes.
 - Use these branch name prefixes based on the primary type of change:
   - `feat/` for new features
   - `fix/` for bug fixes
@@ -114,4 +133,5 @@ When behavior spans multiple modules, update the focused test file for each modu
 ## Release metadata
 
 - Any user-facing feature addition or bug fix must include a changeset.
+- CLI behavior changes, command output changes, install behavior changes, and other user-visible changes count as user-facing changes.
 - Chores, refactors, tests, and internal-only documentation updates do not need a changeset unless they change user-visible behavior.
