@@ -1,5 +1,7 @@
 .worktrees/
 node_modules/
 .claude/settings.local.json
+.claude/worktrees/
 .DS_Store
 dist/
+docs/superpowers/
