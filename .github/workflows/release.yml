@@ -45,6 +45,7 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           RELEASE_DIST_TAG: latest
+          RELEASE_TRIGGER_LABEL: ${{ github.event_name == 'workflow_dispatch' && 'manual-dispatch' || format('#{0}', github.event.pull_request.number) }}
         run: pnpm release:publish
 
       - name: Send release email
@@ -54,14 +55,7 @@ jobs:
           server_port: ${{ secrets.SMTP_PORT }}
           username: ${{ secrets.SMTP_USERNAME }}
           password: ${{ secrets.SMTP_PASSWORD }}
-          subject: ${{ steps.release.outputs.package_name }} release published
+          subject: ${{ steps.release.outputs.email_subject }}
           to: ${{ secrets.SMTP_FROM }}
           from: ${{ secrets.SMTP_FROM }}
-          body: |
-            Package: ${{ steps.release.outputs.package_name }}
-            Dist-tag: ${{ steps.release.outputs.dist_tag }}
-            Version: ${{ steps.release.outputs.version }}
-            Commit: ${{ steps.release.outputs.commit }}
-
-            Triggered by: ${{ github.actor }}
-            Pull request: ${{ github.event_name == 'workflow_dispatch' && 'manual-dispatch' || format('#{0}', github.event.pull_request.number) }}
+          html_body: ${{ steps.release.outputs.email_html }}

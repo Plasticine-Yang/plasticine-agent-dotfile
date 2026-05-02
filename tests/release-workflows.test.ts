@@ -29,10 +29,8 @@ describe("release workflows", () => {
     );
     expect(workflow).toContain("pnpm release:publish");
     expect(workflow).toContain("find .changeset -maxdepth 1 -name");
-    expect(workflow).toContain("Package: $" + "{{ steps.release.outputs.package_name }}");
-    expect(workflow).toContain("Dist-tag: $" + "{{ steps.release.outputs.dist_tag }}");
-    expect(workflow).toContain("Version: $" + "{{ steps.release.outputs.version }}");
-    expect(workflow).toContain("Commit: $" + "{{ steps.release.outputs.commit }}");
+    expect(workflow).toContain("subject: $" + "{{ steps.release.outputs.email_subject }}");
+    expect(workflow).toContain("html_body: $" + "{{ steps.release.outputs.email_html }}");
   });
 
   it("publishes preview packages manually through the preview script and smtp email", async () => {
@@ -44,16 +42,20 @@ describe("release workflows", () => {
     expect(workflow).toContain("SMTP_PORT");
     expect(workflow).toContain("SMTP_USERNAME");
     expect(workflow).toContain("SMTP_PASSWORD");
-    expect(workflow).toContain("Package: $" + "{{ steps.release.outputs.package_name }}");
-    expect(workflow).toContain("Dist-tag: $" + "{{ steps.release.outputs.dist_tag }}");
-    expect(workflow).toContain("Version: $" + "{{ steps.release.outputs.version }}");
-    expect(workflow).toContain("Commit: $" + "{{ steps.release.outputs.commit }}");
+    expect(workflow).toContain("subject: $" + "{{ steps.release.outputs.email_subject }}");
+    expect(workflow).toContain("html_body: $" + "{{ steps.release.outputs.email_html }}");
   });
 
   it("uses publish scripts that derive release metadata from the package file", async () => {
     const packageJson = await readFileFromRepository("package.json");
+    const publishReleaseScript = await readFileFromRepository("scripts/publish-release.mjs");
+    const publishPreviewScript = await readFileFromRepository("scripts/publish-preview-release.mjs");
 
     expect(packageJson).toContain('"release:publish": "node ./scripts/publish-release.mjs"');
     expect(packageJson).toContain('"release:publish:preview": "node ./scripts/publish-preview-release.mjs"');
+    expect(publishReleaseScript).toContain('email_subject=${emailSubject}');
+    expect(publishReleaseScript).toContain('email_html<<${outputDelimiter}');
+    expect(publishPreviewScript).toContain('email_subject=${emailSubject}');
+    expect(publishPreviewScript).toContain('email_html<<${outputDelimiter}');
   });
 });
