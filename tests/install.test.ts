@@ -11,10 +11,7 @@ const TEST_CONFIG: RemoteConfig = {
   claudeCodePlugins: [{ packageName: "superpowers@claude-plugins-official" }],
 };
 
-async function waitForWrite(
-  write: { mock: { calls: Array<[string | Uint8Array, ...unknown[]]> } },
-  value: string,
-) {
+async function waitForWrite(write: { mock: { calls: Array<[string | Uint8Array, ...unknown[]]> } }, value: string) {
   for (let attempt = 0; attempt < 10; attempt += 1) {
     if (write.mock.calls.some(([chunk]) => chunk === value)) {
       return;
@@ -104,8 +101,12 @@ describe("installAll", () => {
       expect(stdout).not.toHaveBeenCalledWith("Installation complete.\n");
       expect(stderr).toHaveBeenCalledWith("Installation finished with 1 failure(s).\n");
       expect(stderr).toHaveBeenCalledWith("Failed commands:\n");
-      expect(stderr).toHaveBeenCalledWith(" - skills add github.com/larksuite/cli --skill lark-doc -g -y -a claude-code\n");
-      expect(stderr).not.toHaveBeenCalledWith("Step failed: claude plugin install superpowers@claude-plugins-official\n");
+      expect(stderr).toHaveBeenCalledWith(
+        " - skills add github.com/larksuite/cli --skill lark-doc -g -y -a claude-code\n",
+      );
+      expect(stderr).not.toHaveBeenCalledWith(
+        "Step failed: claude plugin install superpowers@claude-plugins-official\n",
+      );
     } finally {
       stdout.mockRestore();
       stderr.mockRestore();
@@ -265,7 +266,9 @@ describe("installAll", () => {
       expect(stdout).toHaveBeenCalledWith("\n");
       expect(stderr).toHaveBeenCalledWith("Installation finished with 1 failure(s).\n");
       expect(stderr).toHaveBeenCalledWith("Failed commands:\n");
-      expect(stderr).toHaveBeenCalledWith(" - skills add github.com/larksuite/cli --skill lark-doc -g -y -a claude-code\n");
+      expect(stderr).toHaveBeenCalledWith(
+        " - skills add github.com/larksuite/cli --skill lark-doc -g -y -a claude-code\n",
+      );
     } finally {
       stdout.mockRestore();
       stderr.mockRestore();

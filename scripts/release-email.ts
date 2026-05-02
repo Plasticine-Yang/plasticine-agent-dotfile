@@ -12,7 +12,7 @@ function createPackageUrl(packageName: string) {
 }
 
 function createCommitUrl(repository: string | undefined, commitSha: string | undefined) {
-  if (!repository || !repository.includes("/") || !commitSha) {
+  if (!repository?.includes("/") || !commitSha) {
     return null;
   }
 
@@ -27,13 +27,7 @@ export type ReleaseEmailInput = {
   repository?: string;
 };
 
-export function createReleaseEmail({
-  packageName,
-  version,
-  distTag,
-  commit,
-  repository,
-}: ReleaseEmailInput) {
+export function createReleaseEmail({ packageName, version, distTag, commit, repository }: ReleaseEmailInput) {
   const escapedPackageName = escapeHtml(packageName);
   const escapedVersion = escapeHtml(version);
   const escapedDistTag = escapeHtml(distTag);

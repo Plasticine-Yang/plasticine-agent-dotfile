@@ -4,11 +4,7 @@ export type CommandRunnerOptions = {
   output?: "stream" | "silent";
 };
 
-export type CommandRunner = (
-  command: string,
-  args: string[],
-  options?: CommandRunnerOptions,
-) => Promise<void>;
+export type CommandRunner = (command: string, args: string[], options?: CommandRunnerOptions) => Promise<void>;
 
 export function createCommandRunner(
   stdout: NodeJS.WritableStream = process.stdout,
@@ -18,10 +14,7 @@ export function createCommandRunner(
     new Promise((resolve, reject) => {
       const outputMode = options?.output ?? "stream";
       const child = spawn(command, args, {
-        stdio:
-          outputMode === "silent"
-            ? ["ignore", "ignore", "ignore"]
-            : ["ignore", "pipe", "pipe"],
+        stdio: outputMode === "silent" ? ["ignore", "ignore", "ignore"] : ["ignore", "pipe", "pipe"],
       });
 
       if (outputMode === "stream") {

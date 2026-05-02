@@ -7,6 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `pnpm build` — build the CLI with rolldown into `dist/cli.js`
 - `pnpm typecheck` — run TypeScript type checking with `tsc --noEmit`
 - `pnpm test` — run the Vitest suite
+- `pnpm check` — run the full verification gate (`lint`, `format:check`, `typecheck`, and `test`)
 - `pnpm test -- tests/install.test.ts` — run a single test file with Vitest
 - `pnpm test -- tests/install.test.ts -t "builds both skill and plugin commands from config"` — run a single named test
 - `pnpm exec plasticine-agent-dotfile <command>` — run the CLI locally through the package manager

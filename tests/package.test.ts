@@ -33,6 +33,10 @@ describe("package metadata", () => {
     });
   });
 
+  it("uses the full repository check as the verification gate", () => {
+    expect(packageJson.scripts.check).toBe("pnpm lint && pnpm format:check && pnpm typecheck && pnpm test");
+  });
+
   it("pins publishing to the npmjs registry", async () => {
     const npmrc = await readFile(resolve(testDirectory, "../.npmrc"), "utf8");
     expect(npmrc).toContain("registry=https://registry.npmjs.org/");

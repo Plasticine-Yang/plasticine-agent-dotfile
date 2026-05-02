@@ -69,15 +69,15 @@ describe("release workflows", () => {
     if (publishReleaseScriptExists) {
       const publishReleaseScript = await readFileFromRepository("scripts/publish-release.ts");
       expect(publishReleaseScript).toContain('from "./release-email"');
-      expect(publishReleaseScript).toContain("email_subject=${emailSubject}");
-      expect(publishReleaseScript).toContain("email_html<<${outputDelimiter}");
+      expect(publishReleaseScript).toContain("email_subject=${" + "emailSubject}");
+      expect(publishReleaseScript).toContain("email_html<<${" + "outputDelimiter}");
     }
 
     if (publishPreviewScriptExists) {
       const publishPreviewScript = await readFileFromRepository("scripts/publish-preview-release.ts");
       expect(publishPreviewScript).toContain('from "./release-email"');
-      expect(publishPreviewScript).toContain("email_subject=${emailSubject}");
-      expect(publishPreviewScript).toContain("email_html<<${outputDelimiter}");
+      expect(publishPreviewScript).toContain("email_subject=${" + "emailSubject}");
+      expect(publishPreviewScript).toContain("email_html<<${" + "outputDelimiter}");
     }
   });
 });
