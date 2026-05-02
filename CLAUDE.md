@@ -98,3 +98,20 @@ When behavior spans multiple modules, update the focused test file for each modu
 - local config file workflow
 - install source precedence
 - interactive fallback behavior
+
+## Git workflow
+
+- Any change must be made on a branch created from `main`.
+- Use these branch name prefixes based on the primary type of change:
+  - `feat/` for new features
+  - `fix/` for bug fixes
+  - `docs/` for documentation-only changes
+  - `build/` for build process changes
+  - `ci/` for CI workflow changes
+  - `chore/` for low-impact maintenance changes
+- If a branch includes multiple change types, choose the prefix by this priority order: `feat` > `fix` > `docs` > `build` > `ci` > `chore`.
+
+## Release metadata
+
+- Any user-facing feature addition or bug fix must include a changeset.
+- Chores, refactors, tests, and internal-only documentation updates do not need a changeset unless they change user-visible behavior.

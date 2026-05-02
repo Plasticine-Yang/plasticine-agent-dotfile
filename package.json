@@ -1,6 +1,6 @@
 {
   "name": "plasticine-agent-dotfile",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "bin": {
     "plasticine-agent-dotfile": "dist/cli.js",
